@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MikoKaraoke · Reports</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎤</text></svg>">
+</head>
+<body>
+  <header>
+    <h1>🎤 MikoKaraoke</h1>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="reports.html" class="active">Reports</a>
+      <a href="tipping.html">Tipping</a>
+      <a href="settings.html">Settings</a>
+    </div>
+    <div>
+      <a class="pill-link" id="tipVenmo" href="#" target="_blank" rel="noopener">💸 Venmo</a>
+      <a class="pill-link" id="tipCashApp" href="#" target="_blank" rel="noopener">💵 Cash App</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="card">
+        <div class="section">
+          <h2>Reports</h2>
+          <div class="metrics" id="metrics"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section">
+          <div class="toolbar" style="margin-bottom:8px">
+            <button id="btnExportCsv" class="inline">Export CSV</button>
+            <button id="btnRefresh" class="inline">Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table id="historyTable">
+              <thead><tr><th>When</th><th>Name</th><th>Song</th><th>Artist</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section">
+          <h3 style="margin:0 0 8px">Top Singers</h3>
+          <div class="table-wrap"><table id="topSingers"><thead><tr><th>Singer</th><th>Count</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section">
+          <h3 style="margin:0 0 8px">Top Songs</h3>
+          <div class="table-wrap"><table id="topSongs"><thead><tr><th>Song</th><th>Count</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="footer">
+    <div class="sitemap">
+      <a href="index.html">Home</a> ·
+      <a href="reports.html">Reports</a> ·
+      <a href="tipping.html">Tipping</a> ·
+      <a href="settings.html">Settings</a>
+    </div>
+    <span class="muted">MikoKaraoke © 2025</span>
+  </div>
+
+  <script type="module">
+    import { supabase, wireTipLinks, setActiveNav, escapeHtml, isSameDay, downloadCsv } from './assets/shared.js';
+    wireTipLinks(); setActiveNav('reports.html');
+
+    const metrics = document.getElementById('metrics');
+    const histBody = document.querySelector('#historyTable tbody');
+
+    function metricBox(label, value){
+      const d=document.createElement('div'); d.className='metric';
+      d.innerHTML=`<div class="muted" style="font-size:12px">${label}</div><div style="font-size:20px;font-weight:700">${value}</div>`;
+      return d;
+    }
+    function countBy(list, keyFn){
+      const map=new Map(); for(const item of list){ const k=keyFn(item); if(!k) continue; map.set(k,(map.get(k)||0)+1); }
+      return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20);
+    }
+    function renderTopTable(id, entries){
+      const tb=document.querySelector(`#${id} tbody`); tb.innerHTML='';
+      entries.forEach(([k,v])=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(k)}</td><td>${v}</td>`; tb.appendChild(tr); });
+    }
+
+    async function loadAll(){
+      const { data, error } = await supabase.from('history').select('*').order('finished_at', { ascending:false }).limit(5000);
+      if(error) return;
+
+      metrics.innerHTML='';
+      const total=(data||[]).length;
+      const today=(data||[]).filter(r=>isSameDay(new Date(r.finished_at), new Date())).length;
+      metrics.appendChild(metricBox("Total completed", total));
+      metrics.appendChild(metricBox("Completed today", today));
+
+      histBody.innerHTML='';
+      (data||[]).forEach(r=>{
+        const when=r.finished_at?new Date(r.finished_at).toLocaleString():'';
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${when}</td><td>${escapeHtml(r.name||'')}</td><td>${escapeHtml(r.song||'')}</td><td>${escapeHtml(r.artist||'')}</td>`;
+        histBody.appendChild(tr);
+      });
+
+      renderTopTable('topSingers', countBy(data||[], r=>r.name||''));
+      renderTopTable('topSongs', countBy(data||[], r=>(r.song||'').trim()));
+    }
+
+    document.getElementById('btnExportCsv').onclick = async ()=>{
+      const { data, error } = await supabase.from('history').select('*').order('finished_at',{ascending:false}).limit(5000);
+      if(error){ alert(error.message); return; }
+      const rows = [["finished_at","name","song","artist"]].concat((data||[]).map(h=>[h.finished_at,h.name,h.song||"",h.artist||""]));
+      downloadCsv("karaoke_history.csv", rows);
+    };
+    document.getElementById('btnRefresh').onclick = loadAll;
+    await loadAll();
+  </script>
+</body>
+</html>

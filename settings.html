@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MikoKaraoke · Settings</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎤</text></svg>">
+</head>
+<body>
+  <header>
+    <h1>🎤 MikoKaraoke</h1>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="reports.html">Reports</a>
+      <a href="tipping.html">Tipping</a>
+      <a href="settings.html" class="active">Settings</a>
+    </div>
+    <div>
+      <a class="pill-link" id="tipVenmo" href="#" target="_blank" rel="noopener">💸 Venmo</a>
+      <a class="pill-link" id="tipCashApp" href="#" target="_blank" rel="noopener">💵 Cash App</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="card">
+        <div class="section">
+          <h2>Admin PIN</h2>
+          <div id="settingsLock">
+            <p class="muted">Enter the admin PIN to access settings.</p>
+            <div class="pin-row" style="margin-top:8px">
+              <input id="settingsPinInput" type="password" placeholder="Enter admin PIN" style="max-width:220px" />
+              <button id="btnSettingsUnlock" class="inline">Unlock Settings</button>
+            </div>
+            <p class="muted" style="margin-top:6px">Uses the same PIN as the DJ Console.</p>
+          </div>
+
+          <div id="settingsUI" class="hidden">
+            <p class="muted">Set the admin PIN used to unlock the DJ console & settings (device-local).</p>
+            <div class="pin-row" style="margin-top:8px">
+              <input id="newPin" placeholder="New PIN (e.g., 6 digits)" style="max-width:220px" />
+              <button id="btnSavePin" class="inline">Save PIN</button>
+              <button id="btnLock" class="inline">Lock</button>
+            </div>
+            <p id="pinMsg" class="muted" style="margin-top:6px"></p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="footer">
+    <div class="sitemap">
+      <a href="index.html">Home</a> ·
+      <a href="reports.html">Reports</a> ·
+      <a href="tipping.html">Tipping</a> ·
+      <a href="settings.html">Settings</a>
+    </div>
+    <span class="muted">MikoKaraoke © 2025</span>
+  </div>
+
+  <script type="module">
+    import { wireTipLinks, setActiveNav, getPin, setPin, isUnlocked, setUnlocked, unlockWith } from './assets/shared.js';
+    wireTipLinks(); setActiveNav('settings.html');
+
+    const settingsLock = document.getElementById('settingsLock');
+    const settingsUI   = document.getElementById('settingsUI');
+    function updateSettingsLockUI(){
+      if(isUnlocked()){ settingsLock.classList.add('hidden'); settingsUI.classList.remove('hidden'); }
+      else { settingsUI.classList.add('hidden'); settingsLock.classList.remove('hidden'); }
+    }
+    updateSettingsLockUI();
+
+    document.getElementById('btnSettingsUnlock').onclick = ()=>{
+      const entered = (document.getElementById('settingsPinInput').value || '').trim();
+      if(unlockWith(entered)){ setUnlocked(true); updateSettingsLockUI(); }
+      else alert('Incorrect PIN');
+    };
+    document.getElementById('btnSavePin').onclick = ()=>{
+      const np = (document.getElementById('newPin').value || '').trim();
+      const msg = document.getElementById('pinMsg');
+      if(!np){ msg.textContent = 'Enter a PIN.'; return; }
+      if(np.length < 4){ msg.textContent = 'Use at least 4 characters.'; return; }
+      setPin(np); msg.textContent = 'PIN saved on this device.';
+    };
+    document.getElementById('btnLock').onclick = ()=>{ setUnlocked(false); updateSettingsLockUI(); };
+  </script>
+</body>
+</html>

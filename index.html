@@ -3,644 +3,203 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Karaoke QR Signup</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎤</text></svg>">
+  <title>MikoKaraoke</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root{--bg:#0b1220;--card:#121a2b;--muted:#9fb1d1;--text:#e8f0ff;--accent:#6aa9ff;--good:#29d17e;--warn:#ffd166;--bad:#ff5c7a}
-    *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1a2440 0%,#0b1220 60%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid #1f2a44;background:#0d1526cc;backdrop-filter:saturate(150%) blur(6px);position:sticky;top:0;z-index:5}
-    h1{font-size:20px;margin:0;display:flex;align-items:center;gap:10px}
-    .tag{font-size:12px;padding:4px 8px;border-radius:999px;background:#1d2745;color:#a9c1ff;border:1px solid #2c3a64}
-    main{max-width:1100px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr;gap:16px}
-    .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:1000px){.grid{grid-template-columns:420px 1fr}}
-    .card{background:var(--card);border:1px solid #1f2a44;border-radius:18px;box-shadow:0 8px 30px #00000040}
-    .card h2{margin:0 0 10px;font-size:18px}
-    .section{padding:16px 16px 18px}
-    label{display:block;margin:8px 0 6px;color:var(--muted);font-size:13px}
-    input,select,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2a3a66;background:#0f1730;color:var(--text)}
-    input::placeholder{color:#7584a8}
-    button{cursor:pointer;background:linear-gradient(180deg,#2b67ff,#1a56e6);border:0;font-weight:650;letter-spacing:.2px}
-    button.secondary{background:#162243;border:1px solid #2f457a}
-    button.ghost{background:transparent;border:1px dashed #38528f}
-    button.inline{width:auto}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .muted{color:var(--muted);font-size:13px}
-    .success{color:var(--good)}
-    .warn{color:var(--warn)}
-    .danger{color:var(--bad)}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #22335f;text-align:left;vertical-align:top}
-    th{font-size:12px;color:#b9c7e6;text-transform:uppercase;letter-spacing:.04em}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#0d1731;border:1px solid #2b3f76;font-size:12px}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-    .footer{padding:12px 16px;border-top:1px solid #1f2a44;color:#9fb1d1;font-size:13px;display:flex;justify-content:space-between;align-items:center}
-    .links a{color:var(--accent);text-decoration:none}
-    .hidden{display:none !important}
-    .codebox{background:#0d1731;border:1px dashed #2b3f76;border-radius:12px;padding:10px 12px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
-  </style>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎤</text></svg>">
 </head>
 <body>
   <header>
-    <h1>🎤 QR Karaoke <span class="tag" id="envTag">MVP</span></h1>
-    <div class="toolbar">
-      <button class="secondary inline" id="btnShowSignup">Sign Up</button>
-      <button class="secondary inline" id="btnShowQueue">DJ Console</button>
-      <a class="pill" target="_blank" id="tipVenmo" href="#">💸 Tip: Venmo</a>
-      <a class="pill" target="_blank" id="tipCashApp" href="#">💸 Tip: Cash App</a>
+    <h1>🎤 MikoKaraoke</h1>
+    <div class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="reports.html">Reports</a>
+      <a href="tipping.html">Tipping</a>
+      <a href="settings.html">Settings</a>
+    </div>
+    <div>
+      <a class="pill-link" id="tipVenmo" href="#" target="_blank" rel="noopener">💸 Venmo</a>
+      <a class="pill-link" id="tipCashApp" href="#" target="_blank" rel="noopener">💵 Cash App</a>
     </div>
   </header>
 
-  <main class="grid">
-    <!-- Sign-up card (public; privacy-first) -->
-    <section class="card" id="signupCard">
-      <div class="section">
-        <h2>Get on the list</h2>
-        <p class="muted">Add your name & song. You’ll get a code + personal link to check your status for the next 12 hours. You won’t see other singers.</p>
+  <main>
+    <div class="wrap">
+      <div class="feature-box" id="nowBanner">
+        <span class="label">Now Featuring:</span>
+        <span class="name" id="nowText">—</span>
+      </div>
 
-        <div id="alreadyRow" class="row">
-          <button class="ghost inline" id="btnAlready">I already signed up</button>
-          <input id="codeLookup" placeholder="Enter your 6-digit code" style="max-width:160px" />
-          <button class="secondary inline" id="btnFindByCode">Find me</button>
+      <section class="home-grid">
+        <div class="card">
+          <div class="section">
+            <h2>Join the Queue</h2>
+            <label for="name">Name *</label>
+            <input id="name" placeholder="Your name" />
+            <label for="song">Song (optional)</label>
+            <input id="song" placeholder="Song title" />
+            <label for="artist">Artist (optional)</label>
+            <input id="artist" placeholder="Artist" />
+            <label for="contact">Contact (optional)</label>
+            <input id="contact" placeholder="Phone/email" />
+            <div style="margin-top:10px"><button id="btnJoin">Join Queue</button></div>
+            <p id="msg" class="muted" style="margin-top:8px"></p>
+          </div>
         </div>
 
-        <div id="signupForm">
-          <div class="row">
-            <div style="flex:1">
-              <label>Your Name</label>
-              <input id="name" placeholder="e.g., Maria S." maxlength="40" />
+        <div class="card">
+          <div class="section">
+            <h2>DJ Console</h2>
+
+            <div id="djLock">
+              <div class="pin-row">
+                <input id="pinInput" type="password" placeholder="Enter admin PIN" style="max-width:220px" />
+                <button id="btnUnlock" class="inline">Unlock</button>
+              </div>
+              <p class="muted" style="margin-top:6px">Default PIN: <code>123456</code> (change it in Settings)</p>
             </div>
-            <div style="flex:1">
-              <label>Song Title</label>
-              <input id="song" placeholder="e.g., Don’t Stop Believin’" maxlength="80" />
+
+            <div id="djUI" class="hidden">
+              <div class="toolbar" style="margin-bottom:8px">
+                <button id="btnMarkDone" class="inline">✅ Mark Done</button>
+                <button id="btnRefresh" class="inline">↻ Refresh</button>
+                <button id="btnLock" class="inline">🔒 Lock</button>
+              </div>
+              <div class="table-wrap">
+                <table id="queueTable">
+                  <thead><tr><th>#</th><th>Name</th><th>Song</th><th>Actions</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
             </div>
           </div>
-          <div class="row">
-            <div style="flex:1">
-              <label>Artist (optional)</label>
-              <input id="artist" placeholder="e.g., Journey" maxlength="60" />
-            </div>
-            <div style="flex:1">
-              <label>Contact (optional; SMS or email for DJ use later)</label>
-              <input id="contact" placeholder="e.g., 314-555-0123 or me@example.com" maxlength="80" />
-            </div>
-          </div>
-          <div class="row">
-            <button id="btnJoin">Join the Queue</button>
-            <button class="ghost" id="btnLeaveSelf">Leave the Queue (this device)</button>
-          </div>
         </div>
-
-        <div id="signupMsg" class="muted" style="margin-top:10px"></div>
-
-        <div id="myStatus" class="hidden" style="margin-top:12px">
-          <h3 style="margin:0 0 8px">Your status</h3>
-          <div class="codebox">
-            <div>Code: <strong id="myCode">—</strong> <button class="secondary inline" id="btnCopyCode">Copy</button></div>
-            <div style="margin-top:6px">Personal link: <a id="myLink" href="#" target="_blank">open</a> <button class="secondary inline" id="btnCopyLink">Copy link</button></div>
-            <div class="muted" style="margin-top:6px">Valid for ~12 hours from signup.</div>
-          </div>
-          <div style="margin-top:10px">
-            <div><strong>Position:</strong> <span id="myPosition">—</span></div>
-            <div><strong>Now playing:</strong> <span id="npPublic">—</span></div>
-            <div class="muted" style="margin-top:6px">Keep this tab open for “Up next” alerts.</div>
-          </div>
-        </div>
-      </div>
-      <div class="footer">
-        <span>Privacy mode: <strong>ON</strong></span>
-        <span>Now playing: <strong id="nowPlaying">—</strong></span>
-      </div>
-    </section>
-
-    <!-- DJ console -->
-    <section class="card hidden" id="djCard">
-      <div class="section">
-        <h2>DJ Console</h2>
-        <p class="muted" id="authState">Not signed in</p>
-        <div class="row" id="authRow">
-          <input id="djEmail" placeholder="DJ email to sign in" style="max-width:340px" />
-          <button id="btnMagic">Send Magic Link</button>
-          <button class="secondary" id="btnSignOut">Sign Out</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3 style="margin:0 0 8px">Quick add singer</h3>
-        <div class="row">
-          <input id="djAddName" placeholder="Name" style="max-width:220px" />
-          <input id="djAddSong" placeholder="Song" style="min-width:240px" />
-          <input id="djAddArtist" placeholder="Artist (optional)" style="min-width:180px" />
-          <button class="secondary inline" id="btnDjAdd">Add to end</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="toolbar" style="justify-content:space-between">
-          <div class="row">
-            <button id="btnCallNext">▶️ Call Next</button>
-            <button class="secondary" id="btnMarkDone">✅ Mark Done</button>
-            <button class="secondary" id="btnCycleBack">🔁 Cycle first to end</button>
-          </div>
-          <div class="row">
-            <span class="pill">Queue: <strong id="djCount">0</strong></span>
-            <span class="pill">Sung tonight: <strong id="sungCount">0</strong></span>
-          </div>
-        </div>
-
-        <div style="overflow:auto;max-height:460px;border:1px solid #22335f;border-radius:12px;margin-top:10px">
-          <table id="queueTable">
-            <thead>
-              <tr><th>#</th><th>Name</th><th>Song</th><th>Joined</th><th>Actions</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="footer">
-        <div class="links">
-          <a href="#" id="exportCsv">Export CSV</a>
-        </div>
-        <div>Now playing: <strong id="djNow">—</strong></div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
-  <script>
-    // === CONFIG (EDIT THESE 4 VALUES) ===========================
-    const SUPABASE_URL = "https://YOUR-PROJECT-ref.supabase.co"; // e.g., https://abcxyz.supabase.co
-    const SUPABASE_ANON_KEY = "YOUR-ANON-KEY"; // Project settings → API → anon key
-    const VENMO_URL = "https://venmo.com/u/YOUR_HANDLE";
-    const CASHAPP_URL = "https://cash.app/$YOUR_CASH_TAG";
-    // ============================================================
+  <div class="footer">
+    <div class="sitemap">
+      <a href="index.html">Home</a> ·
+      <a href="reports.html">Reports</a> ·
+      <a href="tipping.html">Tipping</a> ·
+      <a href="settings.html">Settings</a>
+    </div>
+    <div id="upNext">Up Next: —</div>
+  </div>
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true }
-    });
+  <script type="module">
+    import { supabase, wireTipLinks, setActiveNav, escapeHtml, isSameDay, getPin, setPin, isUnlocked, setUnlocked, unlockWith, setupRealtime } from './assets/shared.js';
+
+    wireTipLinks();
+    setActiveNav('index.html');
+
+    // PIN lock UI
+    const djLock = document.getElementById('djLock');
+    const djUI   = document.getElementById('djUI');
+    function updateLockUI(){ if(isUnlocked()){ djLock.classList.add('hidden'); djUI.classList.remove('hidden'); } else { djUI.classList.add('hidden'); djLock.classList.remove('hidden'); } }
+    document.getElementById('btnUnlock').onclick = ()=>{ const p=(document.getElementById('pinInput').value||'').trim(); if(unlockWith(p)){ setUnlocked(true); updateLockUI(); } else alert('Incorrect PIN'); };
+    document.getElementById('btnLock').onclick = ()=>{ setUnlocked(false); updateLockUI(); };
+    updateLockUI();
 
     // UI refs
-    const signupCard = document.getElementById('signupCard');
-    const djCard = document.getElementById('djCard');
-    const btnShowSignup = document.getElementById('btnShowSignup');
-    const btnShowQueue  = document.getElementById('btnShowQueue');
-    const tipVenmo = document.getElementById('tipVenmo');
-    const tipCashApp = document.getElementById('tipCashApp');
-    tipVenmo.href = VENMO_URL; tipCashApp.href = CASHAPP_URL;
-
-    btnShowSignup.onclick = () => { signupCard.classList.remove('hidden'); djCard.classList.add('hidden'); };
-    btnShowQueue.onclick  = () => { signupCard.classList.add('hidden'); djCard.classList.remove('hidden'); };
-
-    // Public elements
-    const publicNowPlayingEl = document.getElementById('nowPlaying');
-    const npPublicEl = document.getElementById('npPublic');
-    const myStatus = document.getElementById('myStatus');
-    const myCodeEl = document.getElementById('myCode');
-    const myLinkEl = document.getElementById('myLink');
-    const myPositionEl = document.getElementById('myPosition');
-    const alreadyBtn = document.getElementById('btnAlready');
-    const codeLookup = document.getElementById('codeLookup');
-    const btnFindByCode = document.getElementById('btnFindByCode');
-    const btnCopyCode = document.getElementById('btnCopyCode');
-    const btnCopyLink = document.getElementById('btnCopyLink');
-
-    // Sign-up form refs
-    const nameEl = document.getElementById('name');
-    const songEl = document.getElementById('song');
+    const nameEl   = document.getElementById('name');
+    const songEl   = document.getElementById('song');
     const artistEl = document.getElementById('artist');
-    const contactEl = document.getElementById('contact');
-    const signupMsg = document.getElementById('signupMsg');
-    document.getElementById('btnJoin').onclick = joinQueue;
-    document.getElementById('btnLeaveSelf').onclick = leaveQueueSelf;
+    const contactEl= document.getElementById('contact');
+    const msgEl    = document.getElementById('msg');
+    const tbody    = document.querySelector('#queueTable tbody');
+    const nowBanner= document.getElementById('nowBanner');
+    const nowText  = document.getElementById('nowText');
+    const upNextEl = document.getElementById('upNext');
+    const btnJoin  = document.getElementById('btnJoin');
+    const btnMarkDone = document.getElementById('btnMarkDone');
+    const btnRefresh = document.getElementById('btnRefresh');
 
-    // “Already signed up” flow
-    alreadyBtn.onclick = () => {
-      codeLookup.focus();
-    };
-    btnFindByCode.onclick = async () => {
-      const code = (codeLookup.value || "").trim();
-      if(!/^\d{6}$/.test(code)) return alert("Enter your 6-digit code.");
-      await loadMySignupByCode(code, true);
-    };
-    btnCopyCode.onclick = async () => {
-      try { await navigator.clipboard.writeText(myCodeEl.textContent); toast("Code copied"); } catch {}
-    };
-    btnCopyLink.onclick = async () => {
-      try { await navigator.clipboard.writeText(myLinkEl.href); toast("Link copied"); } catch {}
-    };
+    btnJoin.onclick = joinQueue;
+    btnMarkDone.onclick = markDone;
+    btnRefresh.onclick = ()=>{ loadQueue(); loadNowPlaying(); };
 
-    // DJ auth
-    const authState = document.getElementById('authState');
-    const authRow = document.getElementById('authRow');
-    const djEmail = document.getElementById('djEmail');
-    document.getElementById('btnMagic').onclick = sendMagicLink;
-    document.getElementById('btnSignOut').onclick = async() => { await supabase.auth.signOut(); updateAuthUI(null); };
-
-    // DJ actions & quick add
-    const djCountEl = document.getElementById('djCount');
-    const sungCountEl = document.getElementById('sungCount');
-    const djNowEl = document.getElementById('djNow');
-    document.getElementById('btnCallNext').onclick = callNext;
-    document.getElementById('btnMarkDone').onclick = markDone;
-    document.getElementById('btnCycleBack').onclick = cycleToEnd;
-    document.getElementById('exportCsv').onclick = exportCsv;
-    document.getElementById('btnDjAdd').onclick = djQuickAdd;
-    const djAddName = document.getElementById('djAddName');
-    const djAddSong = document.getElementById('djAddSong');
-    const djAddArtist = document.getElementById('djAddArtist');
-
-    // Local storage
-    const KEY_LAST_SIGNUP_ID = 'karaoke:lastSignupId';
-    const KEY_LAST_CODE = 'karaoke:lastCode';
-
-    // Realtime
-    const channel = supabase.channel('queue-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'signups' }, refreshAll)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'now_playing' }, refreshAll)
-      .subscribe();
-
-    // Init
-    supabase.auth.getSession().then(({ data }) => updateAuthUI(data.session));
-    supabase.auth.onAuthStateChange((_e, session) => updateAuthUI(session));
-    refreshAll().then(() => checkURLCode());
-
-    function updateAuthUI(session){
-      if(session?.user){
-        authState.textContent = `Signed in as ${session.user.email}`;
-        authRow.style.display = 'none';
-      } else {
-        authState.textContent = 'Not signed in';
-        authRow.style.display = 'flex';
-      }
-    }
-
-    async function sendMagicLink(){
-      const email = djEmail.value.trim();
-      if(!email) return alert('Enter DJ email first');
-      const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
-      alert(error ? `Error: ${error.message}` : 'Magic sign-in link sent. Check your email.');
-    }
-
-    function genNumericCode(){
-      return String(Math.floor(100000 + Math.random()*900000)); // 6-digit
-    }
-
-    function buildPersonalLink(code){
-      const u = new URL(window.location.href);
-      u.searchParams.set('code', code);
-      return u.toString();
-    }
+    let busy=false; function lock(){ if(busy) return false; busy=true; return true; } function unlock(){ busy=false; }
 
     async function joinQueue(){
-      const name = nameEl.value.trim();
-      const song = songEl.value.trim();
-      const artist = artistEl.value.trim();
-      const contact = contactEl.value.trim();
-      if(!name || !song){ signupMsg.textContent = 'Name and song are required.'; return; }
-
-      const code = genNumericCode();
-      const { data, error } = await supabase.from('signups')
-        .insert({ name, song, artist, contact, code, code_expires_at: new Date(Date.now()+12*60*60*1000).toISOString() })
-        .select()
-        .single();
-
-      if(error){ signupMsg.textContent = `Error: ${error.message}`; return; }
-
-      localStorage.setItem(KEY_LAST_SIGNUP_ID, data.id);
-      localStorage.setItem(KEY_LAST_CODE, data.code);
-
-      signupMsg.innerHTML = `<span class="success">You’re in! Your code is <strong>${code}</strong>.</span>`;
-      nameEl.value = songEl.value = artistEl.value = contactEl.value = '';
-
-      // show personal link & status
-      showMyStatus(data.code);
-      await refreshAll(true);
+      if(!lock()) return;
+      try{
+        const name=(nameEl.value||'').trim(); if(!name){ msgEl.textContent='Name is required.'; return; }
+        const song=(songEl.value||'').trim(); const artist=(artistEl.value||'').trim(); const contact=(contactEl.value||'').trim();
+        const { error } = await supabase.from('signups').insert([{ name, song, artist, contact }]);
+        if(error){ msgEl.textContent='Error: '+error.message; return; }
+        nameEl.value=songEl.value=artistEl.value=contactEl.value=''; msgEl.textContent="You're in! 🎉";
+        await loadQueue();
+      } finally { unlock(); }
     }
 
-    async function leaveQueueSelf(){
-      const id = localStorage.getItem(KEY_LAST_SIGNUP_ID);
-      const code = localStorage.getItem(KEY_LAST_CODE);
-      if(!id && !code) return alert('No recent signup found on this device.');
-
-      // Try delete by id first; if failed, allow RPC by code (DJ not required to remove own)
-      let { error } = await supabase.from('signups').delete().eq('id', id);
-      if(error && code){
-        const { error: e2 } = await supabase.rpc('remove_by_code', { p_code: code });
-        error = e2;
-      }
-      alert(error ? `Error: ${error.message}` : 'Removed from the queue.');
-      if(!error){ localStorage.removeItem(KEY_LAST_SIGNUP_ID); localStorage.removeItem(KEY_LAST_CODE); hideMyStatus(); }
+    async function featureRow(row){
+      if(!lock()) return;
+      try{
+        await supabase.from('now_playing').upsert({ id:1, name: row.name, song: row.song||null, artist: row.artist||null, started_at: new Date().toISOString() });
+        await supabase.from('signups').delete().eq('id', row.id);
+        await Promise.all([loadQueue(), loadNowPlaying()]);
+      } finally { unlock(); }
     }
 
-    async function djQuickAdd(){
-      const name = djAddName.value.trim();
-      const song = djAddSong.value.trim();
-      const artist = djAddArtist.value.trim();
-      if(!name || !song) return alert("Name and song required");
-      const code = genNumericCode();
-      const { error } = await supabase.from('signups')
-        .insert({ name, song, artist, code, code_expires_at: new Date(Date.now()+12*60*60*1000).toISOString() });
-      if(error) return alert(error.message);
-      djAddName.value = djAddSong.value = djAddArtist.value = '';
+    async function removeSignup(id){
+      if(!lock()) return;
+      try{ await supabase.from('signups').delete().eq('id', id); await loadQueue(); } finally { unlock(); }
     }
 
-    async function callNext(){ const { error } = await supabase.rpc('call_next'); if(error) alert(error.message); }
-    async function markDone(){ const { error } = await supabase.rpc('mark_done'); if(error) alert(error.message); }
-    async function cycleToEnd(){ const { error } = await supabase.rpc('cycle_to_end'); if(error) alert(error.message); }
-
-    async function moveUp(id){ const { error } = await supabase.rpc('move_up', { p_id: id }); if(error) alert(error.message); }
-    async function moveDown(id){ const { error } = await supabase.rpc('move_down', { p_id: id }); if(error) alert(error.message); }
-
-    async function exportCsv(ev){
-      ev.preventDefault();
-      const { data, error } = await supabase.from('history').select('*').order('finished_at',{ascending:false}).limit(1000);
-      if(error){ alert(error.message); return; }
-      const rows = [Object.keys(data[0]||{id:1,name:2,song:3,artist:4,contact:5,finished_at:6}).join(',')]
-        .concat((data||[]).map(r=>[r.id,r.name,r.song,r.artist||'',r.contact||'',r.finished_at].map(v=>`"${(v??'').toString().replaceAll('"','""')}"`).join(',')));
-      const blob = new Blob([rows.join('\n')],{type:'text/csv'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='karaoke_history.csv'; a.click(); URL.revokeObjectURL(url);
+    async function markDone(){
+      if(!lock()) return;
+      try{
+        const { data: np } = await supabase.from('now_playing').select('*').eq('id',1).maybeSingle();
+        if(np?.name){ await supabase.from('history').insert([{ name: np.name, song: np.song||null, artist: np.artist||null }]); }
+        await supabase.from('now_playing').update({ name:null, song:null, artist:null, started_at:null }).eq('id',1);
+        await Promise.all([loadQueue(), loadNowPlaying()]);
+      } finally { unlock(); }
     }
 
-    async function refreshAll(skipMy=false){
-      // DJ queue
-      const { data: q } = await supabase.from('signups').select('*').order('joined_at'); // DJ can see (RLS limits to DJ)
-      if(q){ renderDjTable(q); djCountEl.textContent = q.length; if(!skipMy) updateMyPosition(q); }
-
-      // Now playing
-      const { data: np } = await supabase.from('now_playing').select('*').single();
-      const nowTxt = np?.name ? `${np.name} — ${np.song}${np.artist?` (${np.artist})`:''}` : '—';
-      publicNowPlayingEl.textContent = nowTxt; djNowEl.textContent = nowTxt; npPublicEl.textContent = nowTxt;
-    }
-
-    function renderDjTable(q){
-      const tbody = document.querySelector('#queueTable tbody');
-      tbody.innerHTML = '';
-      (q||[]).forEach((r,i)=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML =
-          `<td>${i+1}</td>
-           <td>${escapeHtml(r.name)}</td>
-           <td>${escapeHtml(r.song)}${r.artist?`<br><span class='muted'>${escapeHtml(r.artist)}</span>`:''}</td>
-           <td>${new Date(r.joined_at).toLocaleTimeString()}</td>
-           <td class="row">
-             <button class='secondary inline' data-up='${r.id}'>↑</button>
-             <button class='secondary inline' data-down='${r.id}'>↓</button>
-             <button class='secondary inline' data-del='${r.id}'>Remove</button>
-           </td>`;
-        tbody.appendChild(tr);
+    async function loadQueue(){
+      const { data, error } = await supabase.from('signups').select('*').order('created_at', { ascending:true });
+      if(error) return;
+      const nextName = data && data.length ? data[0].name : null;
+      upNextEl.textContent = `Up Next: ${nextName ? nextName : '—'}`;
+      tbody.innerHTML='';
+      (data||[]).forEach((row,i)=>{
+        const tr=document.createElement('tr');
+        const name=escapeHtml(row.name);
+        const song=row.song?escapeHtml(row.song):'<span class="muted">—</span>';
+        tr.innerHTML = `<td>${i+1}</td><td>${name}</td><td>${song}</td><td></td>`;
+        const actions=document.createElement('div');
+        const b1=document.createElement('button'); b1.className='inline'; b1.textContent='Feature'; b1.onclick=()=>featureRow(row);
+        const b2=document.createElement('button'); b2.className='inline'; b2.style.marginLeft='6px'; b2.textContent='Remove'; b2.onclick=()=>removeSignup(row.id);
+        actions.appendChild(b1); actions.appendChild(b2); tr.lastChild.appendChild(actions); tbody.appendChild(tr);
       });
-      tbody.querySelectorAll('button[data-del]').forEach(btn=>btn.onclick=async()=>{
-        const id = btn.getAttribute('data-del');
-        const { error } = await supabase.from('signups').delete().eq('id', id);
-        if(error) alert(error.message);
-      });
-      tbody.querySelectorAll('button[data-up]').forEach(btn=>btn.onclick=()=>moveUp(Number(btn.getAttribute('data-up'))));
-      tbody.querySelectorAll('button[data-down]').forEach(btn=>btn.onclick=()=>moveDown(Number(btn.getAttribute('data-down'))));
     }
 
-    function updateMyPosition(q){
-      const myCode = localStorage.getItem(KEY_LAST_CODE);
-      if(!myCode) return;
-      const idx = (q||[]).findIndex(r=>String(r.code)===String(myCode));
-      if(idx === -1){ myPositionEl.textContent = 'Not currently in queue'; return; }
-      myPositionEl.textContent = (idx+1);
-      if(idx === 0) toast('You are singing now!');
-      else if(idx === 1) toast("You're up next. Please get ready!");
-    }
-
-    async function loadMySignupByCode(code, revealStatus){
-      // Uses secured RPC that returns only that signup if valid (<=12h)
-      const { data, error } = await supabase.rpc('get_signup_by_code', { p_code: code });
-      if(error){ alert(error.message); return; }
-      if(!data){ alert("Not found or expired."); return; }
-
-      localStorage.setItem(KEY_LAST_CODE, code);
-      localStorage.setItem(KEY_LAST_SIGNUP_ID, data.id);
-
-      showMyStatus(code);
-      await refreshAll(true);
-      if(revealStatus) toast("Found your signup.");
-    }
-
-    function showMyStatus(code){
-      myStatus.classList.remove('hidden');
-      myCodeEl.textContent = code;
-      myLinkEl.href = buildPersonalLink(code);
-    }
-    function hideMyStatus(){ myStatus.classList.add('hidden'); }
-
-    function checkURLCode(){
-      const u = new URL(window.location.href);
-      const c = u.searchParams.get('code');
-      if(c && /^\d{6}$/.test(c)){ loadMySignupByCode(c, true); }
-      else{
-        const stored = localStorage.getItem(KEY_LAST_CODE);
-        if(stored) showMyStatus(stored);
+    async function loadNowPlaying(){
+      const { data } = await supabase.from('now_playing').select('*').eq('id',1).maybeSingle();
+      if(data?.started_at && !isSameDay(new Date(data.started_at), new Date())){
+        await supabase.from('now_playing').update({ name:null, song:null, artist:null, started_at:null }).eq('id',1);
+        nowText.textContent='—'; return;
       }
+      const prev=nowText.textContent; const current=data?.name?data.name:'—'; nowText.textContent=current;
+      if(current!==prev){ nowBanner.classList.remove('pulse'); void nowBanner.offsetWidth; nowBanner.classList.add('pulse'); }
     }
 
-    function toast(text){
-      const d = document.createElement('div');
-      d.textContent = text;
-      Object.assign(d.style,{position:'fixed',left:'50%',bottom:'24px',transform:'translateX(-50%)',padding:'12px 16px',border:'1px solid #2b3f76',background:'#0d1731',color:'#e8f0ff',borderRadius:'12px',zIndex:20});
-      document.body.appendChild(d); setTimeout(()=>d.remove(), 3500);
-    }
+    // realtime + polling fallback
+    let lastRealtimeAt = 0; function bump(){ lastRealtimeAt=Date.now(); }
+    setupRealtime({
+      onSignups: () => { bump(); loadQueue(); },
+      onNow:     () => { bump(); loadNowPlaying(); },
+    });
+    bump();
+    const POLL_MS=10000;
+    setInterval(async()=>{ const quiet=Date.now()-lastRealtimeAt>POLL_MS-500; if(!quiet) return; await Promise.all([loadQueue(), loadNowPlaying()]); },POLL_MS);
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) bump(); });
 
-    function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    // init
+    wireTipLinks();
+    await Promise.all([loadQueue(), loadNowPlaying()]);
   </script>
-
-  <!-- ======== Supabase SQL (copy into SQL editor) ========
-  -- Tables
-  create table if not exists public.signups (
-    id bigserial primary key,
-    name text not null,
-    song text not null,
-    artist text,
-    contact text,
-    code text not null, -- 6-digit numeric as text
-    code_expires_at timestamptz not null,
-    joined_at timestamptz not null default now()
-  );
-
-  create table if not exists public.now_playing (
-    id int primary key default 1,
-    name text,
-    song text,
-    artist text,
-    started_at timestamptz
-  );
-  insert into public.now_playing (id) values (1) on conflict (id) do nothing;
-
-  create table if not exists public.history (
-    id bigserial primary key,
-    name text,
-    song text,
-    artist text,
-    contact text,
-    finished_at timestamptz not null default now()
-  );
-
-  create table if not exists public.profiles (
-    user_id uuid primary key references auth.users on delete cascade,
-    email text unique,
-    role text check (role in ('dj','viewer')) default 'viewer'
-  );
-
-  -- Realtime
-  -- Enable on signups, now_playing, history (Database → Replication → Realtime)
-
-  -- RLS
-  alter table public.signups enable row level security;
-  alter table public.now_playing enable row level security;
-  alter table public.history enable row level security;
-  alter table public.profiles enable row level security;
-
-  -- PUBLIC (anon) may:
-  --  - INSERT into signups
-  --  - SELECT now_playing
-  --  - NOT read whole signups (privacy)
-  create policy "public insert signup" on public.signups
-    for insert with check (true);
-
-  create policy "public read now_playing" on public.now_playing
-    for select using (true);
-
-  -- Allow the RPCs (SECURITY DEFINER) below to manage privacy-preserving reads/mutations.
-
-  -- DJ-only permissions:
-  create policy "dj can select signups" on public.signups
-    for select using (
-      exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'dj')
-    );
-
-  create policy "dj can delete signups" on public.signups
-    for delete using (
-      exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'dj')
-    );
-
-  create policy "dj can update now_playing" on public.now_playing
-    for update using (
-      exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'dj')
-    ) with check (
-      exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'dj')
-    );
-
-  create policy "anyone read history" on public.history
-    for select using (true);
-
-  create policy "dj insert history" on public.history
-    for insert with check (
-      exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'dj')
-    );
-
-  create policy "profiles-self" on public.profiles
-    for select using (auth.uid() = user_id);
-  create policy "profiles-insert" on public.profiles
-    for insert with check (auth.uid() = user_id);
-  create policy "profiles-update-self" on public.profiles
-    for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
-  -- Helper: simple count view if you want to show total to public later (optional)
-  create or replace view public.signups_count as
-    select count(*)::int as total from public.signups;
-  -- (RLS doesn't apply to views; for strict control, expose via RPC instead.)
-
-  -- RPCs (security definer) for atomic ops & privacy-safe reads
-  create or replace function public.call_next()
-  returns void language plpgsql security definer as $$
-  declare nxt record;
-  begin
-    if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role='dj') then
-      raise exception 'DJ-only action';
-    end if;
-    select * into nxt from public.signups order by joined_at limit 1;
-    if nxt is null then
-      update public.now_playing set name=null, song=null, artist=null, started_at=null where id=1; return; end if;
-    update public.now_playing set name=nxt.name, song=nxt.song, artist=nxt.artist, started_at=now() where id=1;
-    delete from public.signups where id = nxt.id;
-  end; $$;
-
-  create or replace function public.mark_done()
-  returns void language plpgsql security definer as $$
-  declare cur record;
-  begin
-    if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role='dj') then
-      raise exception 'DJ-only action';
-    end if;
-    select * into cur from public.now_playing where id=1;
-    if cur.name is not null then
-      insert into public.history(name,song,artist,contact) values (cur.name,cur.song,cur.artist,null);
-      update public.now_playing set name=null, song=null, artist=null, started_at=null where id=1;
-    end if;
-  end; $$;
-
-  -- Move first to end (keep UI simple)
-  create or replace function public.cycle_to_end()
-  returns void language plpgsql security definer as $$
-  declare nxt record;
-  begin
-    if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role='dj') then
-      raise exception 'DJ-only action';
-    end if;
-    select * into nxt from public.signups order by joined_at limit 1;
-    if nxt is null then return; end if;
-    delete from public.signups where id=nxt.id;
-    insert into public.signups(name,song,artist,contact,code,code_expires_at)
-      values (nxt.name,nxt.song,nxt.artist,nxt.contact,nxt.code,now() + interval '12 hours');
-  end; $$;
-
-  -- Return *only* the matching signup if code valid and not expired (no queue listing)
-  create or replace function public.get_signup_by_code(p_code text)
-  returns signups as $$
-    select s.*
-    from public.signups s
-    where s.code = p_code and s.code_expires_at >= now()
-    limit 1;
-  $$ language sql security definer;
-
-  -- Allow a self-removal via code (no DJ needed)
-  create or replace function public.remove_by_code(p_code text)
-  returns void language plpgsql security definer as $$
-  begin
-    delete from public.signups where code = p_code and code_expires_at >= now();
-  end; $$;
-
-  -- Reorder helpers by swapping with neighbor based on joined_at
-  create or replace function public.move_up(p_id bigint)
-  returns void language plpgsql security definer as $$
-  declare cur record; prev record;
-  begin
-    if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role='dj') then
-      raise exception 'DJ-only action';
-    end if;
-    select * into cur from public.signups where id=p_id;
-    if cur is null then return; end if;
-    select * into prev from public.signups where joined_at < cur.joined_at order by joined_at desc limit 1;
-    if prev is null then return; end if;
-    update public.signups set joined_at = cur.joined_at where id = prev.id;
-    update public.signups set joined_at = prev.joined_at where id = cur.id;
-  end; $$;
-
-  create or replace function public.move_down(p_id bigint)
-  returns void language plpgsql security definer as $$
-  declare cur record; nxt record;
-  begin
-    if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role='dj') then
-      raise exception 'DJ-only action';
-    end if;
-    select * into cur from public.signups where id=p_id;
-    if cur is null then return; end if;
-    select * into nxt from public.signups where joined_at > cur.joined_at order by joined_at asc limit 1;
-    if nxt is null then return; end if;
-    update public.signups set joined_at = cur.joined_at where id = nxt.id;
-    update public.signups set joined_at = nxt.joined_at where id = cur.id;
-  end; $$;
-
-  -- Seed a DJ profile after the DJ user signs in once:
-  -- insert into public.profiles(user_id,email,role) values ('<auth.uid>','dj@example.com','dj');
-  -->
 </body>
 </html>

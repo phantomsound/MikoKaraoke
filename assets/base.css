@@ -1,0 +1,88 @@
+
+:root{
+  --bg:#0b1220; --card:#121a2b; --muted:#9fb1d1; --text:#e8f0ff; --accent:#6aa9ff;
+  --border:#1f2a44; --soft:#0f1730;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text);
+  background:radial-gradient(1200px 600px at 20% -10%,#1a2440 0%,#0b1220 60%);
+  font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+header{
+  position:sticky; top:0; z-index:5;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 14px; border-bottom:1px solid var(--border);
+  background:#0d1526cc; backdrop-filter:saturate(150%) blur(6px);
+}
+h1{margin:0; font-size:18px; display:flex; align-items:center; gap:10px}
+.nav a{color:var(--accent); text-decoration:none; margin:0 8px; font-weight:600; font-size:14px}
+.nav a.active{text-decoration:underline}
+.pill-link{
+  display:inline-block; padding:8px 12px; border-radius:999px;
+  background:#162243; border:1px solid #2f457a; text-decoration:none;
+  color:var(--accent); font-weight:600; margin-left:6px; font-size:14px;
+}
+@media(min-width:900px){
+  header{padding:16px 18px}
+  h1{font-size:20px}
+  .pill-link{padding:10px 16px; font-size:15px}
+}
+
+main{flex:1; display:flex; justify-content:center; padding:16px 12px}
+.wrap{display:grid; grid-template-columns:1fr; gap:14px; width:100%; max-width:980px}
+.home-grid{display:grid; grid-template-columns:1fr; gap:14px}
+@media(min-width:900px){ .home-grid{grid-template-columns:420px 1fr; gap:16px} }
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:18px; box-shadow:0 8px 30px #00000040}
+.section{padding:14px 14px 16px}
+.card h2{margin:0 0 8px; font-size:18px}
+label{display:block; margin:8px 0 6px; color:var(--muted); font-size:13px}
+input, button{
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a3a66; background:var(--soft); color:var(--text)
+}
+input::placeholder{color:#7584a8}
+button{
+  cursor:pointer; background:linear-gradient(180deg,#2b67ff,#1a56e6); border:0; font-weight:650; letter-spacing:.2px
+}
+button.inline{width:auto}
+.toolbar{display:flex; gap:8px; flex-wrap:wrap}
+table{width:100%; border-collapse:collapse; min-width:420px}
+th,td{padding:10px; border-bottom:1px solid #22335f; text-align:left; vertical-align:top; font-size:14px}
+th{font-size:12px; color:#b9c7e6; text-transform:uppercase; letter-spacing:.04em}
+.table-wrap{overflow:auto; border:1px solid #22335f; border-radius:12px}
+.footer{
+  padding:10px 14px; border-top:1px solid var(--border); color:#9fb1d1; font-size:14px;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px
+}
+.muted{color:var(--muted)}
+.hidden{display:none !important}
+.sitemap{display:flex; gap:12px; flex-wrap:wrap}
+.sitemap a{color:var(--accent); text-decoration:none}
+.metrics{display:flex; gap:12px; flex-wrap:wrap}
+.metric{background:var(--soft); border:1px solid #2a3a66; border-radius:12px; padding:10px 12px}
+.pin-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+/* Now Featuring pill */
+.feature-box{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px;
+  background:rgba(13,23,49,.7); border:1px solid #2b3f76;
+  box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.04);
+  font-size:14px; font-weight:600; line-height:1;
+  backdrop-filter:saturate(140%) blur(4px);
+  max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  justify-self:center;
+}
+.feature-box .label{ color:var(--muted); font-weight:500; }
+.feature-box .name{ max-width:60vw; overflow:hidden; text-overflow:ellipsis; }
+@media (max-width:480px){ .feature-box .name{ max-width:70vw; } }
+
+@keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.03)} 100%{transform:scale(1)} }
+.feature-box.pulse{ animation:pulse .45s ease-out; }
+
+@media(max-width:480px){
+  input, button{padding:14px 16px}
+  .section{padding:14px}
+}
